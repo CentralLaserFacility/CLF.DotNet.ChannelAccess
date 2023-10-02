@@ -14,7 +14,7 @@
     <DefineConstants>SUPPORT_STATE_CHANGE_EVENTS_NO</DefineConstants>
     <DefineConstants>SUPPORT_VALUE_CHANGE_THROTTLING_NO</DefineConstants>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <Configurations>Debug;Release;EPAC_SIM</Configurations>
+    <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

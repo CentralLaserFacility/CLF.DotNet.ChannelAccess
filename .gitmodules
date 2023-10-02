@@ -1,0 +1,4 @@
+[submodule "CLF.DotNet.Common"]
+	path = CLF.DotNet.Common
+	url = git@github.com:CentralLaserFacility/CLF.DotNet.Common.git
+	branch = main

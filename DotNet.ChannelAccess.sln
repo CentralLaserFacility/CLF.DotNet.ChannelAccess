@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Clf.ChannelAccess.WinFormsA
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Clf.ChannelAccess.CommandLineApp", "Clf.ChannelAccess.CommandLineApp\Clf.ChannelAccess.CommandLineApp.csproj", "{42E32C70-CB85-42DB-B177-B4DB331F2DA0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Clf.Common", "..\CLF.DotNet.Common\Clf.Common\Clf.Common.csproj", "{6F2B1C1A-152C-48D4-8068-B79115169398}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Clf.Common", "CLF.DotNet.Common\Clf.Common\Clf.Common.csproj", "{6F2B1C1A-152C-48D4-8068-B79115169398}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Clf.ChannelAccess.ValueGetter", "Clf.ChannelAccess.ValueGetter\Clf.ChannelAccess.ValueGetter.csproj", "{75A4E69E-D8EA-4B3D-A1FE-765C84466219}"
 EndProject

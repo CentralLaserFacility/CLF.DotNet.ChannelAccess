@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\CLF.DotNet.Common\Clf.Common\Clf.Common.csproj" />
+    <ProjectReference Include="..\CLF.DotNet.Common\Clf.Common\Clf.Common.csproj" />
     <ProjectReference Include="..\Clf.EpicsDlls\Clf.EpicsDlls.csproj" />
   </ItemGroup>
 

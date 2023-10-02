@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Clf.ThinIoc": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

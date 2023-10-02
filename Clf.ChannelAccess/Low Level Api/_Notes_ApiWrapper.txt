@@ -1,0 +1,119 @@
+//
+// _Notes_ApiWrapper.txt
+//
+
+//
+//  https://epics.anl.gov/base/R3-15/9-docs/CAref.html // ********************** LATEST
+//
+//  https://epics.anl.gov/base/R3-15/9-docs/RecordReference.html
+//  https://epics.anl.gov/base/R3-15/9-docs/dbCommonRecord.html
+//  https://epics.anl.gov/base/R3-15/9-docs/waveformRecord.html
+//
+//  https://docs.epics-controls.org/en/latest/guides/EPICS_Process_Database_Concepts.html
+//
+//  https://epics.anl.gov/base/R3-15/6-docs/CAproto/index.html ********
+//
+
+//
+// BETTER TO USE 3.14 ?
+// https://wiki-ext.aps.anl.gov/epics/index.php/RRM_3-14
+//
+//  We don't seem to be calling 'ca_task_initialize', even though the docs say
+//  'Should be called once prior to making any of the other channel access calls.'
+// 
+//  Connect() is equivalent to Connect(true) ie with events.
+// 
+//  Likewise with 'ca_task_exit()'.
+// 
+//  We're relying on a finaliser for ProcessVariable to call 'ca_context_destroy()' !!
+// 
+//  Hmm, the docs for 'ca_search()' say that a better name would be 'ca_create_channel()'.
+//  Whilst 'ca_search()' is described in the (latest?) docs, in the .h file it's marked as deprecated ...
+// 
+//  Aha, see also **************
+//  https://epics.anl.gov/base/R3-14/12-docs/CAref.html (Ralph Lange)
+// 
+//  Beacon period is typically 15 secs.
+// 
+//  Flushing and Blocking
+//    Significant performance gains can be realized when the CA client library doesn't wait for a response to return from the server after each request. 
+//    All requests which require interaction with a CA server are accumulated (buffered) and not forwarded to the IOC until one of ca_flush_io(), ca_pend_io(), ca_pend_event(), or ca_sg_block() are called allowing several operations to be efficiently sent over the network together. 
+//    Any process variable values written into your program's variables by ca_get() should not be referenced by your program until ECA_NORMAL has been received from ca_pend_io().
+// 
+//  ca_create_channel
+//  
+//    Due to the inherently transient nature of network connections ...
+//      the order of connection callbacks relative to the order that ca_create_channel() calls are made by the application can't be guaranteed, 
+//      and application programs may need to be prepared for a connected channel to enter a disconnected state at any time.
+//    
+//    The function ca_state(CHID) can be used to test the connection state of a channel.
+// 
+//    See also 'ca_clear_channel()'.
+// 
+//  ca_put()
+//  ca_array_put()
+// 
+//    When ca_put() or ca_array_put() are invoked the client will receive no response unless the request can not be fulfilled in the server. 
+//    If unsuccessful an exception handler is run on the client side.
+// 
+//  ca_put_callback()
+//  ca_array_put_callback()
+// 
+//    When ca_put_callback() or ca_array_put_callback() are invoked the user supplied asynchronous callback is called only after the initiated write operation, and all actions resulting from the initiating write operation, complete.
+// 
+//    USERARG is a pointer sized variable retained and then passed back to user supplied function.
+// 
+//  All of these functions return ECA_DISCONN if the channel is currently disconnected.
+// 
+//  All put requests are accumulated (buffered) and not forwarded to the IOC until one of ca_flush_io(), ca_pend_io(), ca_pend_event(), or ca_sg_block() are called. This allows several requests to be efficiently combined into one message.
+// 
+// 
+//  ca_get()
+//  ca_array_get()
+//  ca_get_callback()
+//  ca_array_get_callback() !!! THIS TELLS US THE NUMBER OF VALID ELEMENTS IN THE ARRAY !!!  
+//    All get requests are accumulated (buffered) and not forwarded to the IOC until one of
+//    ca_flush_io(), ca_pend_io(), ca_pend_event(), or ca_sg_block() are called. 
+//    This allows several requests to be efficiently sent over the network in one message.
+// 
+// ca_sg_create()
+//   A synchronous group can be used to guarantee that a set of channel access requests have completed. Once a synchronous group has been created then channel access get and put requests may be issued within it using ca_sg_array_get() and ca_sg_array_put() respectively. The routines ca_sg_block() and ca_sg_test() can be used to block for and test for completion respectively.
+//    ??? Is there an equivalent facility on the server ? Whereby a 'write' to a set of values is
+//    regarded as being incomplete until all of those values have been written. If that's not the case,
+//    then accessing them as a group on the client might not be bulletproof, as the server won't
+//    be publishing them as an atomic group.
+//  ca_sg_block()
+//    Values written into your program's variables by a channel access synchronous group request should not be referenced by your program until ECA_NORMAL has been received from ca_sg_block(). This routine will process pending channel access background activity while it is waiting.
+//  ca_sg_test()
+//    Test to see if all requests made within a synchronous group have completed.
+//  ca_sg_array_get()
+//    Read a value from a channel and increment the outstanding request count of a synchronous group. 
+//    The ca_sg_get() and ca_sg_array_get() functionality is implemented using ca_array_get_callback().
+//    ??? Hmm, but we don't get to wake up our own callback when the group operation completes ??
+//    The values written into your program's variables by ca_sg_get() or ca_sg_array_get() should not be referenced by your program until ECA_NORMAL has been received from ca_sg_block(), or until ca_sg_test() returns ECA_IODONE.
+//    All remote operation requests such as the above are accumulated (buffered) and not forwarded to the server until one of ca_flush_io(), ca_pend_io(), ca_pend_event(), or ca_sg_block() are called. This allows several requests to be efficiently sent in one message.
+// 
+//  ca_add_exception_event()
+//    Replace the currently installed CA context global exception handler callback.
+//    When an error occurs in the server asynchronous to the clients thread then information about this type of error is passed from the server to the client in an exception message. When the client receives this exception message an exception handler callback is called.
+//    The default exception handler prints a diagnostic message on the client's standard out and terminates execution if the error condition is severe.
+// 
+//  Latest :
+//    typedef int caPrintfFunc ( const char *pFormat, va_list args );
+//    int ca_replace_printf_handler ( caPrintfFunc *PFUNC );
+//  ???
+//
+
+//
+// Marshaling Data with Platform Invoke **********
+// https://docs.microsoft.com/en-us/dotnet/framework/interop/marshaling-data-with-platform-invoke
+// https://docs.microsoft.com/en-us/dotnet/framework/interop/default-marshaling-for-arrays
+//
+
+//
+// Size of C 'int' in 64 bit compilations ?
+// https://stackoverflow.com/questions/13335587/sizeof-unsigned-int-in-microsoft-x64-compiler
+// Aha, int is still 32 bits ; officially 'implementation dependent' !!
+//
+
+

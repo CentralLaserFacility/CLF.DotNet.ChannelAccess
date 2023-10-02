@@ -1,0 +1,72 @@
+﻿//
+// _Notes for CSharp workshop.txt
+//
+
+Channel Access with C# ... at long last !!!
+
+  Enable UI's that use Blazor, WinUI, WPF, WinForms ...
+
+  Enable 'IOC' functionality to be implemented in C# (later)
+
+Status :
+
+  It's been a rocky road ...
+  Prototype 01 02 03 ... 13 14
+  Preview 01 02 03 04
+                   |
+                   Reasonably complete
+                   Reasonably happy with the API's
+                   Tests work ... but need more Tests ...
+                   Let's see if it works in practice !!!
+                   First, integrate with Aoun's Blazor stuff
+                   EXPECT A FEW THINGS TO CHANGE !!!
+                   Also, lots still TODO ...
+
+                   PREVIEW !!!
+                   VS 2022
+
+Project structure
+
+  Clf.ChannelAccess
+  Clf.ChannelAccess.Tests
+  Clf.ChannelAccess.CommandLineApp
+  Clf.ChannelAccess.WinFormsApp
+  Clf.ChannelAccess.UsageExamples
+
+  Clf.Common
+
+Namespaces
+  
+  Clf.ChannelAccess
+  Clf.Common
+
+Demo - CommandLineApp
+  Talking to PV's hosted by SoftIoc ('xx.db')
+  get ; put ; monitor
+
+Demo - running the tests
+
+Channel Access API
+
+  IChannel ; IChannelsHub
+
+  PvName
+  PvValueInfo
+  PvFieldInfo
+  AuxiliaryInfo
+
+Internals
+
+  Seriously tricky stuff !
+  Interop with 'C' API (ca.dll)
+  Threading issues, C# 'async'
+  Lifetime of 'channel' instances
+  Protocol of interactions with server
+    Connect ; Read/Write ; Subscribe
+
+Source code
+
+  PLEASE SET YOUR VISUAL STUDIO SETTINGS TO *NOT* AUTOMATICALLY REFORMAT !!!
+
+    Tools / Options / Text Editor / C# / Tabs : Block, size 2, insert spaces    
+    Tools / Options / Text Editor / C# / Code Style / Formatting - clear all check boxes

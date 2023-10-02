@@ -1,0 +1,9 @@
+﻿//
+// _Notes.txt
+//
+
+This project holds the DLL's that are required to support Channel Access and ThinIoc,
+and also the 'dbd' file required by ThinIoc.
+
+
+

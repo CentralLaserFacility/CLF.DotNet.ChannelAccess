@@ -1,0 +1,42 @@
+﻿//
+// _Issues.txt
+//
+
+We should put these into GitHub as issues ...
+
+Modify the code to use Serilog for publishing log messages.
+Need to map the various 'Notification' types into Serilog 'levels' : Debug, Warning, etc ...
+
+Go through the code looking at all the places that an exception could be thrown,
+and where possible, continue after logging an error message.
+
+When a 'reconnect' occurs following a disconnect, we should check that the field type hasn't changed.
+That could happen if someone has stopped an IOC, rebuilt the IOC having edited a PV to publish
+a different type, and then restarted the IOC. If we detect this, the right thing to do is
+just ignore the reconnect ; client code will see the PV as being unavailable.
+
+If a write to a PV provides a value that is of an incompatible type (eg we write an 'int' to a VAL
+of type 'double') the write shouldn't throw an exception ; instead, we should log an error
+and quietly continue without having written anything.
+
+If we read from a PV, getting an 'object', and its value is of a different type, the 'cast'
+will fail with an exception. SO ALL CLIENT CODE SHOULD BE WRITTEN WITH THIS IN MIND ??? !!!
+
+In the command line interpreter, support optional arguments that specify the ValueAccessMode.
+
+=========================
+
+Aha ! Channel Access needs to be prepared for a PV to change character under its feet !
+The type of a Value (or indeed the limits etc defined in the Auxiliary Info) might change
+on every Connect, if the PV has been modified ; so we should update that information
+on every reconnect, and issue a log message if it has changed.
+
+===================================
+
+Currently we assume that the Value is never null. Should we revisit this ??
+
+At present, client code doesn't check for null, it just casts the 'object' to the expected type.
+
+==================================
+
+

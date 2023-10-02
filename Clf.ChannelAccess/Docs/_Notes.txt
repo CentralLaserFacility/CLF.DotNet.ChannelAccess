@@ -1,0 +1,200 @@
+﻿//
+// _Notes.txt
+//
+
+Recommended XML documentation tags for a class and its members
+https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/xmldoc/recommended-tags
+
+How to check for DLL dependency ?
+https://stackoverflow.com/questions/7378959/how-to-check-for-dll-dependency
+
+======================
+
+Native interoperability best practices ***********
+https://docs.microsoft.com/en-us/dotnet/standard/native-interop/best-practices
+
+=======================
+
+Outstanding questions :
+
+  If a PV is visible, can it have Write access but not Read access ??
+
+  If type is SHORT, can make a request with type STRING, but get back empty !!
+
+  Can declare a waveform with -1 elements !! No syntax error. Min length is actually 1.
+
+  Alarm and status and severity ... ???
+
+Interesting ...
+
+  If you monitor an Array, then by default the entire array gets sent with every change notification. Could potentially avoid this by monitoring a different field, ie not VAL but a custom field telling you the 'sequence number', and query the VAL when necessary.
+  PyEpics client has an 'AUTOMONITOR_MAXLENGTH' setting which governs whether arrays larger/smaller than that are monitored.
+  https://pyepics.github.io/pyepics/arrays.html
+
+  PyEpics has the concept of a 'device', where you specify the 'base' name and the names of interesting Fields.
+  https://pyepics.github.io/pyepics/devices.html
+
+  PyEpics has a 'get_ctrlVars()' which gets a dictionary of all the 'ctrl' fields for a particular PV.
+
+  pv.force_read_access_rights()
+  Force a read of the access rights for a PV. Normally, a PV will have access rights determined automatically and subscribe to changes in access rights. But sometimes (especially 64-bit Windows), the automatically reported values are wrong. This methods will explicitly read the access rights.
+  https://pyepics.github.io/pyepics/pv.html#pv.get_ctrlvars
+
+  pv.run_callback(index)
+  Execute a particular user-defined callback right now, even if the PV has not changed. Useful for debugging!
+
+  Motor device
+  https://pyepics.github.io/pyepics/devices.html#module-device
+  https://pyepics.github.io/pyepics/devices.html#motorattr-table
+
+  clear_cache() : Clears global caches of Epics CA connections, and fully
+    detaches from the CA context. 
+
+  Access Rights event ???
+  ca_replace_access_rights_event
+
+=====================
+
+Await, SynchronizationContext, and Console Apps
+https://devblogs.microsoft.com/pfxteam/await-synchronizationcontext-and-console-apps/
+
+Understanding the SynchronizationContext in .NET with C#
+https://www.codeproject.com/Articles/5274751/Understanding-the-SynchronizationContext-in-NET-wi
+
+Await, SynchronizationContext, and Console Apps
+https://devblogs.microsoft.com/pfxteam/await-synchronizationcontext-and-console-apps/
+
+Understanding the SynchronizationContext in .NET with C# 
+https://www.codeproject.com/Articles/5274751/Understanding-the-SynchronizationContext-in-NET-wi
+
+Async Programming - Unit Testing Asynchronous Code: Three Solutions for Better Tests
+https://docs.microsoft.com/en-us/archive/msdn-magazine/2014/november/async-programming-unit-testing-asynchronous-code-three-solutions-for-better-tests
+
+Async Programming - Unit Testing Asynchronous Code
+https://docs.microsoft.com/en-us/archive/msdn-magazine/2014/november/async-programming-unit-testing-asynchronous-code
+
+StephenCleary/AsyncEx: A helper library for async/await.
+https://github.com/StephenCleary/AsyncEx
+
+Why is AsyncContext needed when using async/await with a console application ?
+https://stackoverflow.com/questions/28840188/why-is-asynccontext-needed-when-using-async-await-with-a-console-application
+
+AsyncContext Wiki
+https://github.com/StephenCleary/AsyncEx/wiki/AsyncContext
+
+Async Console Programs
+https://blog.stephencleary.com/2012/02/async-console-programs.html
+
+AsyncContext from SqlTools
+https://microsoft.github.io/sqltoolssdk/api/Microsoft.SqlTools.ServiceLayer.Utility.AsyncContext.html
+
+Awaitable Console Application
+https://www.codeproject.com/Articles/738096/Awaitable-Console-Application
+
+Would you recommend using AsyncContext over using '.Wait()' for awaiting an async method from a non-async Main() method ?
+I use either AsyncContext or GetAwaiter().GetResult() in my Main methods. GetAwaiter().GetResult() is essentially the same as Wait() but doesn't wrap exceptions in an AggregateException. It just depends on what I need.
+AsyncContext installs a true single-threaded context on the main Console thread. GetAwaiter().GetResult() keeps the free-threaded context that is default in a Console app. If I'm writing proof-of-concept code that will eventually end up in an ASP.NET or UI app (with a single-threaded context), I'll usually use AsyncContext; if I'm writing a real Console app, I can go either way.
+
+Async Console Programs
+https://blog.stephencleary.com/2012/02/async-console-programs.html
+I've looked at the AsyncContextThread class but can't figure out how I'm supposed to use it, sorry for being obtuse.
+Essentially, you create an AsyncContextThread:
+  var thread = new AsyncContextThread();
+This creates a new thread with its own AsyncContext and starts it running.
+Then, you can queue work to it using its context's TaskFactory:
+  thread.Context.Factory.Run(...) ;
+When you are done, use Join or Dispose to cause the thread to exit.
+
+Async Unit Tests, Part 1: The Wrong Way
+https://blog.stephencleary.com/2012/02/async-unit-tests-part-1-wrong-way.html
+
+Async unit tests
+https://bryanavery.co.uk/async-unit-tests/
+In theory, Async unit testing seems easy, run the Async, wait until it is finished and look at the results.  But as you will find out it is not that easy.
+Here is the official approach to Async unit testing:
+  [TestMethod]
+  public void FourDividedByTwoIsTwo ( )
+  {
+    GeneralThreadAffineContext.Run(
+      async () => {
+        int result = await MyClass.Divide(4, 2);
+        Assert.AreEqual(2, result);
+      }
+    ) ;
+  }
+  [TestMethod]
+  [ExpectedException(typeof(DivideByZeroException))]
+  public void DenominatorIsZeroThrowsDivideByZero ( )
+  {
+    GeneralThreadAffineContext.Run(
+      async () => {
+        await MyClass.Divide(4, 0);
+      }
+    ) ;
+  }
+
+GeneralThreadAffineContext
+https://github.com/StephenCleary/AsyncCTPUtil/blob/master/AsyncTestUtilities/GeneralThreadAffineContext.cs
+
+AsyncContext (Stephen Cleary) ****************
+https://github.com/StephenCleary/AsyncEx/wiki/AsyncContext
+
+AsyncEx
+https://github.com/StephenCleary/AsyncEx
+
+Async Programming : Unit Testing Asynchronous Code (Stephen Cleary)
+https://docs.microsoft.com/en-us/archive/msdn-magazine/2014/november/async-programming-unit-testing-asynchronous-code
+
+Understanding the SynchronizationContext in .NET with C#
+https://www.codeproject.com/Articles/5274751/Understanding-the-SynchronizationContext-in-NET-wi
+Once you have it you can call Post() to fire and forget a delegate on the SynchronizationContext's associated message loop thread, or you can call Send() to block until the foreign execution is complete. 
+
+Is Task.Result the same as .GetAwaiter.GetResult() ?
+https://stackoverflow.com/questions/17284517/is-task-result-the-same-as-getawaiter-getresult
+
+Don't Block on Async Code *************** (Stephen Cleary ; 300+ comments !)
+https://blog.stephencleary.com/2012/07/dont-block-on-async-code.html
+ConfigureAwait(false) is not a workaround to avoid a deadlock. The best way to avoid that deadlock is to not block on async code in the first place. If you absolutely cannot avoid it, then consider one of the hacks in my brownfield async article. For example, just wrapping the top-level call in Task.Run (the 'thread pool hack') removes the context from the very beginning of A:
+void CustomerCall()
+{
+  Task.Run(
+    () => A()
+  ).GetAwaiter().GetResult() ;
+}
+------------------
+Exception handling is different when using Wait/Result ; use GetAwaiter().GetResult() if you want to avoid AggregateException wrappers.
+
+Async/Await Explained with Diagrams and Examples
+https://www.codeproject.com/Articles/5299501/Async-Await-Explained-with-Diagrams-and-Examples
+There are very few ways to use Task.Result and Task.Wait correctly so the general advice is to completely avoid using them in your code.
+
+Utilizing Async/Await in .NET Console applications
+https://stackoverflow.com/questions/57579612/utilizing-async-await-in-net-console-applications-breaks-when-calling-applicati
+Stephen's post is from 2012; is there another solution ? Perhaps his AsyncPump class has been integrated (and/or modified) into a more recent version of .NET ? I would prefer to use a library-designated equivalent, if available, such so that if any changes occur to the under-the-covers implementation of Async/Await, it will automatically be updated as well.
+It has not been included in .NET.
+
+The danger of TaskCompletionSource class when used with async/await
+https://devblogs.microsoft.com/premier-developer/the-danger-of-taskcompletionsourcet-class/
+Effectively, TaskCompletionSource<T> represents a future result and gives an ability to set the final state of the underlying task manually by calling SetCanceled, SetException or SetResult methods.
+If you use .NET 4.6.1+ you should always provide TaskCreationOptions.RunContinuationsAsynchronously when creating TaskCompletionSource instances.
+
+Await, SynchronizationContext, and Console Apps ************* (Stephen Toub)
+https://devblogs.microsoft.com/pfxteam/await-synchronizationcontext-and-console-apps/
+https://devblogs.microsoft.com/pfxteam/await-synchronizationcontext-and-console-apps-part-2/
+https://devblogs.microsoft.com/pfxteam/await-synchronizationcontext-and-console-apps-part-3/
+
+Implementing a SynchronizationContext.SendAsync method
+https://devblogs.microsoft.com/pfxteam/implementing-a-synchronizationcontext-sendasync-method/
+
+DispatcherSynchronizationContext Class (System.Windows.Threading)
+https://docs.microsoft.com/en-us/dotnet/api/system.windows.threading.dispatchersynchronizationcontext?view=net-5.0
+
+DispatcherSynchronizationContext.cs
+https://referencesource.microsoft.com/#windowsbase/Base/System/Windows/Threading/DispatcherSynchronizationContext.cs
+
+Dispatcher.cs
+https://referencesource.microsoft.com/#windowsbase/Base/System/Windows/Threading/Dispatcher.cs
+
+DispatcherOperation.cs
+https://referencesource.microsoft.com/#windowsbase/Base/System/Windows/Threading/DispatcherOperation.cs
+

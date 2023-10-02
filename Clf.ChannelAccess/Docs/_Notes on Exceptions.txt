@@ -1,0 +1,128 @@
+﻿//
+// _Notes on Exceptions.txt
+//
+
+In the current code, exceptions are thrown for various reasons :
+
+  Usage error, eg 
+    supplying a PV name that's not valid
+    asking for 'aux' info on a non-VAL field
+
+  Unexpected condition encountered internally, eg 
+    getting a DBF of -1 !
+    getting a callback that refers to a channel that's been closed
+
+  Assertion failed, eg
+    casting an illegal int value from the C API, to a C# enum
+    This throws a FluentAssertions.Execution.AssertFailedException
+
+  In some cases, exceptions are thrown in ca_ wrapper functions (eg ca_array_get)
+  if the return value is other than OK, despite the possibility that the error
+  might be one that we could recover from.
+  eg in the case of ca_array_get,
+    ECA_BADCOUNT   - Requested count larger than native element count
+    ECA_NORDACCESS - Read access denied
+    ECA_DISCONN    - Channel is disconnected
+
+WE SHOULD DEFINE CUSTOM EXCEPTIONS TO COVER THESE CASES ?
+Will make the code more expressive ...
+  ChannelAccess.UsageErrorException
+  ChannelAccess.UnexpectedConditionException
+  ChannelAccess.AssertFailedException
+
+=================
+
+Client code accessing a Value will throw an exception if the 'cast'
+from the Value (as 'object') fails because the PV is publishing
+a different type
+
+  eg 
+    image data, where 'ArrayData' can be byte[] or short[] ...
+    expecting a double but getting a 'short' ... !!!
+
+  We should provide strongly-typed helpers that let the client code
+  define the type that it's expecting. If the PV value turns out to be
+  not of that exact type, we could attempt to perform a conversion,
+  and log a warning message. If no conversion is possible, we don't throw
+  an exception but instead put the channel in a 'not-connected' state
+  and log an error message.
+
+===========================
+
+Given that we want to *never* throw an exception, best strategy (if we would have
+thrown an exception) is to
+  1. Treat the channel as disconnected
+  2. Issue a message
+  3. Provide an API that can report 'why' the channel is disconnected :
+     - is it disconnected because the PV isn't there ?
+     - or because an exception has been caught ?
+
+====================
+
+Another issue to address ...
+
+  We might initially connect to a PV on machine 'A' ; that might go offline,
+  and that same PV name might become available on machine 'B'. So we'll see
+  a re-connect on that channel, but the IP address might have changed, and
+  possibly the data type might have changed. Our strategy should be to carry on,
+  with the channel now supplied by machine 'B' ... but we should log what happened.
+
+================
+
+Given that these odd things can happen when we connect and disconnect,
+it would be useful for a channel to provide not only an 'IsConnected' flag,
+but also a ConnectionStatusHistory that provides a summary of what's been
+going on, eg
+  at 12.35.45 Connected to server on 130.32.11.24, data type is int[23]
+  at 12.47.00 Disconnected from server on 130.32.11.24
+  at 12.55.25 Reconnected to 130.32.11.24, data type changed from int[23] to double[23]
+  at 12.47.00 Disconnected from IOC on 130.32.11.24
+  at 13.55.25 Connected to different server 130.32.11.25, data type is double[23]
+  ... 
+Server change could happen for because of Load Balancing !!!
+
+This could be provided by a Channel, or (better!) accessed by looking at log messages.
+
+========================
+
+IChannel 
+{
+
+  // Hmm, we might be 'connected' but to a channel that's
+  // providing a value of a type that's not what we expect !!!
+
+  bool IsConnected { get ; } // If true, everything is nominal ...
+
+  // ???
+
+  // We have a connection to a server, but for one reason or another
+  // it's not trusted to be providing us with valid data.
+  // For example :
+  //   - data type is incompatible
+  //   - server is an unexpected IP address ???
+
+  bool IsPhysicallyConnectedButDisabled { get ; } 
+
+  // ???
+
+  ConnectionStatus ConnectionStatus { get ; }
+
+}
+
+record ConnectionStatus (
+  bool       IsPhysicallyConnected,
+  bool       IsLogicallyConnected,
+  IPAddress? ServerProvidingCurrentConnection,
+  IPAddress? ServerProvidingPreviousConnection,
+  FieldInfo? CurrentFieldInfo,
+  FieldInfo? PreviousFieldInfo,
+) ;
+
+enum ChannelValueTypeStatus {
+  ValueTypeFromChannelIsAsExpected,
+  ValueTypeFromChannelRequiredConversion,
+  ValueTypeFromChannelIsIncompatible
+}
+
+
+

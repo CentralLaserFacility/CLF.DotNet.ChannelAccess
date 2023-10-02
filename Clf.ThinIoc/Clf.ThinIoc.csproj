@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Configurations>Debug;Release;EPAC_SIM</Configurations>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Clf.ChannelAccess\Clf.ChannelAccess.csproj" />
+    <ProjectReference Include="..\..\CLF.DotNet.Common\Clf.Common\Clf.Common.csproj" />
+    <ProjectReference Include="..\Clf.EpicsDlls\Clf.EpicsDlls.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,149 @@
+﻿//
+// TODO.txt
+//
+
+************ Remove StateChanged event !!!
+
+************ Rework the ChannelsRegistry to avoid 'static' methods ...
+
+************ Make more of the classes 'internal' where appropriate
+
+Update the XML docs
+
+REVISIT THE CLONED REFERENCES SCHEME ... rework to use InterlockedExchange(nTotalReferences) ??
+
+Return types from Async helpers can throw an exception ??? See 'Hub' API's ...
+
+CommandLineInterpreter - add a command to set the timeout ?
+
+???? ChannelName = PvBaseName + FieldName ***************
+
+TODO : Helpers to perform type conversion *****************
+
+Scheme for accessing 'log' notifications
+
+Ensure that any exception gets handled as a 'log' notification
+
+Make available as a NuGet package ...
+
+??? Is it worthwhile to have a 'Clf.Common' that is reused across many packages ???
+Currently, Clf.Common is specific to Channel Access.
+Need to merge in stuff from the 'Common' libraries used in the IntensityProfileViewer and MachineSafety.
+
+Review the types of the exceptions that we throw 
+
+Review the use of FluentAssertions ... only use to assert truly 'impossible' conditions
+
+-------------------------
+
+*** UPDATE THIS TODO LIST !!!!
+
+Maybe record this info as Github 'issues' ??
+
+Lots of 'TODO's flagged in the code.
+*** Review these, tick off the easy ones
+
+-------------------------
+
+Possible API changes ...
+
+Review the way timeout failures work
+
+----------------------------
+
+INTERNALS :
+
+Move to using new 'namespace' declaration, and some 'global usings' ??
+
+Use the 'async' helpers from the Visual Studio helpers library ??
+
+Log ECA 'warning' messages, via an installed callback accessible to the DllFunctions ??
+
+Split out the ChannelsHub 'static' stuff into a singleton 'ChannelsRegistry'.
+Can then support having more than one ChannelsHub.
+
+-------------------------------
+
+TESTING :
+
+Explicit tests for the Clone scheme.
+
+Evaluate moving from xUnit to MS Test, lots of improvements in .Net 6
+
+Rework the tests to use common code for scalar values and array values
+
+Implement a 'test' server as a 'proper' IOC ...
+
+Implement softIoc as a callable DLL, with P/Invoke wrapper 
+With API to start/stop, enabling more tests to verify recovery after disconnects etc
+Implement 'commands' to change alarm limits and so on ???
+
+Verify actual behaviour when non-VAL fields are changed.
+
+Verify the 'SubscribeToMonitorCallbacks' mechanism ...
+  Enabled when a client connects to the StateChanged event
+  Last one to leave turns the lights out ...
+
+Test the 'GetOrCreate' mechanism and the 'Dispose' handling,
+including when the client forgets to Dispose.
+
+Scalability ; test with lots of PV's, check for memory leaks, ensuring correct calls to Dispose.
+
+Multi-threading : thrash the ChannelsHub !!!
+
+Several PV's, interacting ...
+
+Verify that it works on Linux (using .so libraries instead of DLL's)
+
+------------------------------
+
+Apps using the library :
+
+  CommandLine app, currently a tool for testing - but could be useful as a proper App (caget/caput/camonitor)
+
+  Beef up the WinForms demo ; more data types ; event-log viewing in separate list
+
+  Blazor version of the WinForms app
+  WinUI version of the WinForms app
+
+  Integrate with IntensityProfileViewer ; synthesised images, and real camera images
+
+---------------------
+
+Enhancements ?
+
+API for querying the event log
+
+DATA TYPE CONVERSION HELPERS ???
+
+LONG STRINGS ???
+
+Implement a query for 'record' type name eg 'waveform' (exposed via PvFieldInfo) ?
+
+Mechanism for measuring and reporting the times taken for read/write transactions to complete ?
+
+Stale Values ? If regular updates are expected ...
+Implemented with a watchdog-timer scheme.
+
+-------------------------------
+
+Code walkthrough and review 
+  CLF
+  also a CA API expert eg Graham or Ralph Lange ??
+
+-----------------------
+
+Documentation !!!
+  End-user docs and examples
+    Markdown docs with diagrams and example code
+    Interactive notebook ??
+    Best practice patterns for connecting to Blazor UI elements, WinUI controls.
+  Internals (notes plus a Zoom recording)
+
+-------------------------
+
+
+
+
+
+

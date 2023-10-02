@@ -1,0 +1,573 @@
+#
+# xx.db
+#
+# Setting up PV's of various data types, for testing Channel Access
+#
+
+#
+# To invoke 'softIoc' with this file :
+#
+#   Open a linux command-line window in the directory containing this 'xx.db' file
+#   eg 
+#     wslubuntults@Lenovo:/mnt/c/Users/steve/source/repos/DotNetChannelAccess/Clf.ChannelAccess.Tests/xx.db
+#
+#   Run softIoc :
+#   
+#    $ softIoc -d xx.db
+#    Starting iocInit
+#    ############################################################################
+#    ## EPICS R3.15.6
+#    ## EPICS Base built Jun  9 2021
+#    ############################################################################
+#    iocRun: All initialization complete
+#    epics>
+#
+
+##
+## QUESTIONS / ISSUES :
+##
+##  PV name can be up to 60 chars, but NAME field can only return 39 when queried via Channel Access !!!
+##
+##  Zero length arrays not allowed, but that's what they get initialised to ...
+##
+##  Max array size determined by EPICS_CA_MAX_ARRAY_BYTES
+##  which can be set up via 'setEnv()' in st.cmd passed to softIoc ???
+##
+##    !!! Can view this via 'epics> epicsParamShow' in softIoc,
+##    !!! and it shows a value of 16384 ... however we can successfully
+##    !!! work with arrays-of-short of 16384 elements !!
+##
+##  ACKT and ACKS ???
+##
+##  Enum strings can be up to 25 chars long, not 26 !! 
+##  Must not be empty, otherwise the 'short' value gets returned instead of a string !!
+##  Enum values - do they have to be set up ?
+##  How do enum value come about - just with mbbi ??
+##  Can the integer values be omitted ?
+##
+
+# 
+# This set of record definitions is in a file called 'xx.db',
+# and we're going to use 'xx' as the 'prefix' for the PV names.
+# When we run this using 'softIoc' we can think of the IOC 
+# being named 'xx', and its published PV's having names based on that.
+#
+
+#
+# Note : if you edit this file in Visual Studio, be sure to configure
+# the file encoding as 'UTF8 without signature'. The default is to include
+# a byte-order-mark as the first character, and that confuses softIoc.
+# This can be done via 'File/Save-As'.
+#
+
+#
+# We can access the 'value' of a PV as
+# 'xx:pv_name.VAL' ; the '.VAL' is optional.
+#
+
+#
+# These are the data types we want to exercise :
+#
+#   DBF_CHAR  
+#   DBF_SHORT 
+#   DBF_LONG  
+#   DBF_FLOAT 
+#   DBF_DOUBLE
+#   DBF_STRING
+#
+#   DBF_ENUM  
+#
+
+#
+# Empty arrays have undefined behavior !!!
+# https://bugs.launchpad.net/epics-base/+bug/1881563
+#
+
+#
+# Record types that we care about :
+#
+#   Analog Array Input Record    aai
+#   Analog Array Output Record   aao
+#   Analog Input Record          ai
+#   Analog Output Record         ao
+#   Binary Input Record          bi
+#   Binary Output Record         bo
+#   Long Input Record            longin
+#   Long Output Record           longout
+#   Long String Input Record     lsi
+#   Long String Output Record    lso
+#   String Input Record          stringin
+#   String Output Record         stringout
+#   Waveform Record              waveform
+#
+# https://epics.anl.gov/base/R3-15/8-docs/RecordReference.html
+#   
+
+#
+# Constant Links ?? Hmm, not in v3.
+# https://epics.anl.gov/base/R3-16/2-docs/links.html
+#
+# Being able to initialise a field is a 'v7' feature, not available in v3.
+# Best solution is to run a command file that uses 'dbpf xx:name value'
+# to set values. Note however that the 'dbpf' doesn't have a syntax 
+# for setting array elements - you can only set the first one.
+#
+#  > softIoc -d xx.db initialise_xx.cmd
+#
+
+#
+# Syntax references : 
+#
+#   dbXXX commands :
+#   https://epics.anl.gov/base/R3-14/12-docs/AppDevGuide/node10.html#SECTION001020000000000000000
+#
+#   IOC shell commands :
+#   https://epics.anl.gov/base/R3-14/12-docs/AppDevGuide/node19.html#SECTION001920000000000000000
+#
+# List
+#  dbl
+#  dbl waveform 
+#  dbl waveform DESC
+#
+# Get Field
+#  dbgf xx:one_short
+#  dbgf xx:one_short.VAL
+#  dbgf xx:one_short.EGU
+#  dbgf xx:one_short.SEVR   => "INVALID" if not yet written
+#  dbgf xx:one_short.STAT   => "UDF" if not yet written
+#
+# Print Record
+#   dbpr xx:one_short 
+#   dbpr xx:one_short 0 Fields of interest to an Application developer 
+#                       and that can be changed as a result of record processing
+#   dbpr xx:one_short 1 Fields of interest to an Application developer 
+#                       and that do not change during record processing
+#   dbpr xx:one_short 2 Fields of major interest to a System developer
+#   dbpr xx:one_short 3 Fields of minor interest to a System developer
+#   dbpr xx:one_short 4 Fields of no interest
+#   
+## ???? Note that 'dbpr xx:one_short.DESC' reports the state of the 'record' 
+## rather than the DESC field ...
+#
+# IOCSH commands
+#   epicsEnvShow [name]
+#   epicsParamShow    => shows EPICS_CA_MAX_ARRAY_BYTES !!!
+#   epicsEnvSet EPICS_CA_MAX_ARRAY_BYTES 100000 // Minimum is 16384 ... bytes ???
+#
+# See https://pyepics.github.io/pyepics/arrays.html
+#
+# A waveform record always provides a 'NORD' field
+# that tells us how many elements have been populated.
+# Short for 'Number of elements Read', makes sense when
+# your waveform record is being read from a device.
+#
+# The 'NELM' field defines the number of available elements.
+# Zero if no elements have been written.
+#
+
+record(waveform,"xx:one_short")
+{
+  field(DESC,"One 16-bit integer value")
+  field(FTVL,"SHORT")
+  field(NELM,"1")
+}
+
+record(waveform,"xx:four_shorts")
+{
+  field(DESC,"Array of 4 16-bit integer values")
+  field(FTVL,"SHORT")
+  field(NELM,"4")
+}
+
+record(waveform,"xx:one_char")
+{
+  field(DESC,"One 8-bit byte value")
+  # Strings over 40 chars should be supported, accessed via .DESC$ ???
+  # field(DESC,"One 8-bit byte value ; with lots more interesting information")
+  field(FTVL,"CHAR")
+  field(NELM,"1")
+  field(INP,[123])
+}
+
+record(waveform,"xx:one_long")
+{
+  field(DESC,"One 32-bit integer value")
+  field(FTVL,"LONG")
+  field(NELM,"1")
+}
+
+record(waveform,"xx:one_float")
+{
+  field(DESC,"One 32 bit floating point value")
+  field(FTVL,"FLOAT")
+  field(NELM,"1")
+}
+
+record(waveform,"xx:one_double")
+{
+  field(DESC,"One double-precision value")
+  field(FTVL,"DOUBLE")
+  field(NELM,"1")
+  # Define these fields so that we can check
+  # that the values are accessible, either by
+  # querying them explicitly or via DBR_CTRL
+  field(EGU,"units_ABC") # 9 chars here but only 7 seen
+  field(PREC,"5")        # Precision
+  # Display limits, 'operating range'.
+  # NOTE THAT SETTING THESE ALSO SETS DRVH and DRVL !!!
+  field(HOPR,"+12.0")
+  field(LOPR,"-2.0")
+  # Alarm limits
+  # field(HIHI,"+11.0")
+  # field(HIGH,"+10.0")
+  # field(LOW,"-0.0")
+  # field(LOLO,"-1.0")
+  # Drive limits
+  # field(DRVH,"+10.0")
+  # field(DRVL,"0.0") 
+}
+
+record(waveform,"xx:one_string")
+{
+  field(DESC,"One value of type STRING")
+  field(FTVL,"STRING")
+  field(NELM,"1")
+}
+
+record(waveform,"xx:four_chars")
+{
+  field(DESC,"Array of 4 'byte' values")
+  field(FTVL,"CHAR")
+  field(NELM,"4")
+}
+
+record(waveform,"xx:ten_chars")
+{
+  field(DESC,"Array of 10 'byte' values")
+  field(FTVL,"CHAR")
+  field(NELM,"10")
+}
+
+record(waveform,"xx:four_longs")
+{
+  field(DESC,"Array of 4 32-bit integer values")
+  field(FTVL,"LONG")
+  field(NELM,"4")
+}
+
+record(waveform,"xx:four_floats")
+{
+  field(DESC,"Array of 4 'float' values")
+  field(FTVL,"FLOAT")
+  field(NELM,"4")
+}
+
+record(waveform,"xx:four_doubles")
+{
+  field(DESC,"Array of 4 'double' values")
+  field(FTVL,"DOUBLE")
+  field(NELM,"4")
+}
+
+record(waveform,"xx:four_strings")
+{
+  field(DESC,"Array of 4 'string' values")
+  field(FTVL,"STRING")
+  field(NELM,"4")
+}
+
+# To prove that all these are valid characters
+# in a 'base' name
+
+record(ai,"xx:Weirdly_Named_123-+[]<>;")
+{
+}
+
+record(ai,"xx:long_name_26_a_________")
+{
+}
+
+record(ai,"xx:long_name_27_b_________")
+{
+}
+
+# Arrays of various types and lengths,
+# for experiments with max lengths ...
+
+record(waveform,"xx:char_N")
+{
+  field(DESC,"Array of 'char' values")
+  field(FTVL,"CHAR")
+  field(NELM,"32768")
+}
+
+record(waveform,"xx:short_N")
+{
+  field(DESC,"Array of 'short' values")
+  field(FTVL,"SHORT")
+  field(NELM,"32768")
+}
+
+record(waveform,"xx:double_N")
+{
+  field(DESC,"Array of 'double' values")
+  field(FTVL,"DOUBLE")
+  field(NELM,"100000")
+}
+
+record(waveform,"xx:double_16384")
+{
+  field(DESC,"Array of 16384 'double' values")
+  field(FTVL,"DOUBLE")
+  field(NELM,"16384")
+}
+
+record(waveform,"xx:double_16385")
+{
+  field(DESC,"Array of 16385 'double' values")
+  field(FTVL,"DOUBLE")
+  field(NELM,"16385")
+}
+
+# Long arrays of shorts
+
+record(waveform,"xx:short_100")
+{
+  field(DESC,"Array of 100 'short' values")
+  field(FTVL,"SHORT")
+  field(NELM,"100")
+}
+
+record(waveform,"xx:short_16383")
+{
+  field(DESC,"Array of 16383 'short' values")
+  field(FTVL,"SHORT")
+  field(NELM,"16383")
+}
+
+record(waveform,"xx:short_16384")
+{
+  field(DESC,"Array of 16384 'short' values")
+  field(FTVL,"SHORT")
+  field(NELM,"16384")
+}
+
+record(waveform,"xx:short_16385")
+{
+  field(DESC,"Array of 16385 'short' values (TOO LONG)")
+  field(FTVL,"SHORT")
+  field(NELM,"16385")
+}
+
+# Long arrays of char
+
+record(waveform,"xx:char_100")
+{
+  field(DESC,"Array of 100 'char' values")
+  field(FTVL,"CHAR")
+  field(NELM,"100")
+}
+
+record(waveform,"xx:char_16383")
+{
+  field(DESC,"Array of 16383 'char' values")
+  field(FTVL,"CHAR")
+  field(NELM,"16383")
+}
+
+record(waveform,"xx:char_16384")
+{
+  field(DESC,"Array of 16384 'char' values")
+  field(FTVL,"CHAR")
+  field(NELM,"16384")
+}
+
+record(waveform,"xx:char_16385")
+{
+  field(DESC,"Array of 16385 'char' values (TOO LONG)")
+  field(FTVL,"CHAR")
+  field(NELM,"16385")
+}
+
+record(waveform,"xx:char_32767")
+{
+  field(DESC,"Array of 32767 'char' values (TOO LONG)")
+  field(FTVL,"CHAR")
+  field(NELM,"32767")
+}
+
+record(waveform,"xx:char_32768")
+{
+  field(DESC,"Array of 32768 'char' values (TOO LONG)")
+  field(FTVL,"CHAR")
+  field(NELM,"32768")
+}
+
+record(waveform,"xx:abc_ABC_123-+[]<>;_max_length_of_pv_name_is_60_characters")
+{
+  field(DESC,"Very long PV name of 60 characters")
+  field(FTVL,"SHORT")
+  field(NELM,"1")
+}
+
+record(waveform,"xx:four_shorts_not_written")
+{
+  field(DESC,"Four shorts never written to")
+  field(FTVL,"SHORT")
+  field(NELM,"4")
+}
+
+# record(waveform,"xx:___________________max_length_of_pv_name_is_60_characters")
+# {
+# }
+
+# Enum - arrays of these are not supported
+
+record(mbbi,"xx:one_enum") 
+{
+  field(DESC, "A single enum with 16 options")
+  field(ZRST, "option 0")    field(ZRVL, "1000")
+  field(ONST, "option 1")    field(ONVL, "1001")
+  field(TWST, "option 2")    field(TWVL, "2")
+  field(THST, "option 3")    field(THVL, "3")
+  field(FRST, "option 4")    field(FRVL, "4")
+  field(FVST, "option 5")    field(FVVL, "5")
+  field(SXST, "option 6")    field(SXVL, "6")
+  field(SVST, "option 7")    field(SVVL, "7")
+  field(EIST, "option 8")    field(EIVL, "8")
+  field(NIST, "option 9")    field(NIVL, "9")
+  field(TEST, "option 10")   field(TEVL, "10")
+  field(ELST, "option 11")   field(ELVL, "11")
+  field(TVST, "option 12")   field(TVVL, "12")
+  field(TTST, "option 13")   field(TTVL, "13")
+  field(FTST, "option 14")   field(FTVL, "14")
+  field(FFST, "option 15")   field(FFVL, "15")
+}
+
+#
+# Some more experiments with 'enum'.
+#
+# It seems that the 'string' values get defined via the ZRST,ONST,TWST fields
+# and you can specify up to 16 of these. The VAL field is an integer, nominally
+# in the range 0 to N-1. If you use 'caget' to ask for the value, by default
+# it returns the corresponding string, or an empty string if the 'string' for
+# that option hasn't been configured. Actually you can set the VAL to any integer,
+# and if there's no corresponding string then an empty string will be returned.
+# A warning is issued by 'caput' if you set a value greater than the expected limit.
+#
+# The ZRVL,ONVL fields and so on let you associate specific integer values with the
+# numbered options, but these are NOT reported via the VAL field (which is always
+# a small integer nominally 0-15). If you want to retrieve the value for the 3rd
+# option, you have to query the THVL field. That field may or may not be present.
+#
+
+record(mbbi,"xx:one_enum_six") 
+{
+  field(DESC, "A single enum with 6 options")
+  field(ZRST, "option 0 ZRVL 100") field(ZRVL, "100")
+  field(ONST, "option 1 ONVL 101") field(ONVL, "101")
+  field(TWST, "option 2 no TWVL") 
+  field(THST, "option 3 THVL 103") field(THVL, "103")
+                                   field(FRVL, "104")
+  field(FVST, "option 5 FVVL 105") field(FVVL, "105")
+}
+
+record(mbbi,"xx:one_enum_with_4_specified_option_names") 
+{
+  field(DESC, "A single enum with 4 named options")
+  # Strings up to 25 characters are ok,
+  # but strings of 26 characters are rejected with a syntax error
+  # field(ZRST, "option zero 26 xxxxxxxxxxX" )  field(ZRVL,"0")
+  field(ZRST, "option zero 25 xxxxxxxxxX" )  field(ZRVL,"0")
+  field(ONST, "option one 25 xxxxxxxxxxX" )  field(ONVL,"1")
+  field(TWST, "option two"                )  field(TWVL,"2")
+  field(THST, "option three"              )  field(THVL,"3")
+  field(FRST, ""                          )  field(FRVL,"4")
+}
+
+# Not currently used in the C# tests ...
+
+record(stringout,"stringout_a")
+{       
+  field(DTYP,"Soft Channel")
+  field(DESC,"String out example")
+  field(VAL,"This is a string")
+}
+
+#
+# Fields with 'limit' info
+#
+# The 'ai' records (also 'aai', 'ao' etc) fundamentally have a VAL type of DOUBLE.
+# That's not explicitly stated in the docs, but it can be inferred.
+# The HIHI, HIGH, LOW, and LOLO fields are also DOUBLE.
+#
+# The VAL field can be 'NaN', if the input device hasn't provided a value.
+#
+# https://epics.anl.gov/base/R3-15/8-docs/aiRecord.html
+#
+# Note that the docs tell us that the EGU can be up to 16 characters,
+# and that's correct when you access the EGU field as a PV field ('.EGU')
+# but the MAX_UNITS_SIZE in the 'DBR_' struct allows for only 8 characters
+# and that includes a terminating null ...
+#
+
+record(ai,"xx:ai")
+{       
+  # Operator display fields. 
+  # HOPR and LOPR define the expected numeric range
+  # for not only the VAL, but also the alarm limits etc.
+  field(DESC, "Analog input, eg measuring a voltage")
+  field(EGU,  "mv" ) # Engineering Units
+  field(PREC, "3"  ) # Digits of floating-point precision
+  field(HOPR, "9.0") # High Operating Range Limit
+  field(LOPR, "0.0") # Low  Operating Range Limit
+
+  #
+  # The user configures limit alarms by putting numerical values 
+  # into the HIHI, HIGH, LOW and LOLO fields, and by setting 
+  # the associated alarm severity in the corresponding 
+  # HHSV, HSV, LSV and LLSV menu fields.
+  #
+  # The HYST field controls hysteresis to prevent alarm chattering 
+  # from an input signal that is close to one of the limits 
+  # and suffers from significant readout noise
+  #
+
+  field( HIHI, "8.0" ) # Upper Alarm Limit
+  field( HIGH, "7.0" ) # Upper Warning Limit
+  field( LOW,  "2.0" ) # Lower Warning Limit
+  field( LOLO, "1.0" ) # Lower Alarm Limit
+}
+
+# https://epics.anl.gov/base/R3-15/8-docs/aoRecord.html
+
+record(ao,"xx:ao")
+{
+  # You write the 'desired output' to the VAL field.
+  # Outputted values get clipped to these limits
+  field(DESC, "Analog output, eg driving a display")
+  field(DRVH, "1.0") # Drive High limit
+  field(DRVL, "0.0") # Drive Low Limit
+  # The actual output (after clipping) can be read as the OVAL field
+
+  # We can also supply 'operator display fields'!
+  field(EGU,  "mm" ) # Engineering Units
+  field(PREC, "3"  ) # Digits of floating-point precision
+  field(HOPR, "9.0") # High Operating Range Limit
+  field(LOPR, "0.0") # Low  Operating Range Limit
+}
+
+record(lsi,xx:lsi)
+{
+  # https://epics-base.github.io/epics-base/lsoRecord.html
+  field(SIZV,"100")
+  field(DTYP,"Soft Channel")
+}
+
+record(lso,xx:lso)
+{
+  # https://epics-base.github.io/epics-base/lsoRecord.html
+  field(SIZV,"100")
+  field(OMSL,"supervisory")
+  field(DTYP,"Soft Channel")
+}

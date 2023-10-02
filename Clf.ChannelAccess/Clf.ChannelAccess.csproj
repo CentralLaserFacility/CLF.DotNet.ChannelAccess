@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <GenerateProgramFile>false</GenerateProgramFile>
+    <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
+    <DisableImplicitNamespaceImports>true</DisableImplicitNamespaceImports>
+    <Version>0.4.0</Version>
+    <Description>Epics Channel Access for .Net</Description>
+    <Copyright>Rutherford Labs, Central Laser Facility</Copyright>
+    <Company>Rutherford Labs, Central Laser Facility</Company>
+    <DefineConstants>SUPPORT_STATE_CHANGE_EVENTS_NO</DefineConstants>
+    <DefineConstants>SUPPORT_VALUE_CHANGE_THROTTLING_NO</DefineConstants>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <Configurations>Debug;Release;EPAC_SIM</Configurations>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Channel base\ChannelBase_disposing_old_01.cs" />
+    <Compile Remove="Channels hub\ChannelsHub_channel_interactions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.0" />
+    <PackageReference Include="FluentAssertions" Version="6.11.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\CLF.DotNet.Common\Clf.Common\Clf.Common.csproj" />
+    <ProjectReference Include="..\Clf.EpicsDlls\Clf.EpicsDlls.csproj" />
+  </ItemGroup>
+
+</Project>

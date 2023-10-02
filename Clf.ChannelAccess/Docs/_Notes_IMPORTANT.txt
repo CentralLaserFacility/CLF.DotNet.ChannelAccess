@@ -1,0 +1,36 @@
+﻿//
+// _Notes_IMPORTANT.txt
+//
+
+IMPORTANT :
+
+  Namespaces / assemblies
+
+    Clf.Common 
+      Utilities
+      Logging
+
+    Clf.ChannelAccess
+      interface IChannel
+      class ChannelsHub
+        .GetOrCreateChannel()
+        .PutValueAsync()
+      static class Helpers
+      class PvValueInfo ... etc
+      [ lots of other classes can be 'internal' ]
+
+    Other assemblies ...
+    Clf.PvAccess ???
+    Clf.BlazorUI ???
+
+  Logging !!!
+    Ordinary events, for tracing and debugging interactions with IOC's
+    Errors of various kinds ...
+
+  CHANNEL LIFETIME !!! 
+    IChannel is IDisposable ... necessary to release resources,
+    but maybe better to just do this with a final call to a ChannelsHub method ???
+    So IChannel would not be IDisposable, no need for 'using' ...
+    But maybe that's an argument for having multiple ChannelsHub instances,
+    where each 'hub' would manage a collection of PV's ???
+      

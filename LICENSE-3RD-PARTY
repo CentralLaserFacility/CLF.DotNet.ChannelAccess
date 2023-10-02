@@ -1,0 +1,11 @@
+Note that not all files in the DotNet.ChannelAccess repository and in the released
+software packages belong to the DotNet.ChannelAccess project. For 3rd party files, 
+the individual licenses apply.
+
+* Com.dll ca.dll dhCore.dll dbRecStd.dll softIoc.dbd
+    Copyright (c) EPICS - Experimental Physics and Industrial Control System
+    EPICS Open License, https://github.com/epics-base/epics-base/blob/7.0/LICENSE
+
+* FluentAssertions
+    Copyright (c) Dennis Doomen 2010-2023
+    Apache-2.0, https://github.com/fluentassertions/fluentassertions/blob/develop/LICENSE

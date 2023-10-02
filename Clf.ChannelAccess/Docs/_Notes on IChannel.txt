@@ -1,0 +1,45 @@
+﻿//
+// _Notes on IChannel.txt
+//
+
+Simple scenario : GetOrCreate() returns new instance ...
+
+  IChannelWrapper   --------->    IConcreteChannel
+
+                                  This might be ...
+                                    RemoteChannel
+                                    LocalChannel
+                                    InvalidChannel
+
+With a 2nd GetOrGCreate(), we'll have multiple references 
+to the same underlying Channel instance ...
+
+  IChannelWrapper   ------------+
+                                 \
+                                  IConcreteChannel   
+                                 /
+  IChannelWrapper   ------------+
+
+
+========================
+
+Typically we'll install our IChannel into a ChannelsHandler.
+
+This maintains a dictionary of IChannel-to-ActiveChannelDescriptor pairs.
+An ActiveChannelHandler maintains a reference to an IConcreteChannel,
+
+When the ChannelsHandler receives an incoming message regarding a
+connection status change or a value change, that message will be from 
+an IConcreteChannel. That concrete channel may or may not be one that's referred to
+by a ChannelWrapper instance that has been installed into the ChannelsHandler.
+In order to react to the incoming message, we have to scan through the ActiveChannelDescriptor
+instances and for the IChannelWrapper that it's holding, see whether the WrappedChannel it refers to
+is the IConcreteChannel that issued the change.
+
+A simple search would be fine, but performance could be improved if we built a dictionary that gets us from
+an IWrappedChannel to the IChannelWrapper.
+
+
+
+
+

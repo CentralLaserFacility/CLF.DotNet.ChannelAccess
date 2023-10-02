@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Clf.ChannelAccess.CommandLineApp": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

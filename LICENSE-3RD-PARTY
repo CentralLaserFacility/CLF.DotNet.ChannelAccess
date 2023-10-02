@@ -1,5 +1,5 @@
-Note that not all files in the DotNet.ChannelAccess repository and in the released
-software packages belong to the DotNet.ChannelAccess project. For 3rd party files, 
+Note that not all files in the CLF.DotNet.ChannelAccess repository and in the released
+software packages belong to the CLF.DotNet.ChannelAccess project. For 3rd party files, 
 the individual licenses apply.
 
 * Com.dll ca.dll dhCore.dll dbRecStd.dll softIoc.dbd

@@ -14,7 +14,7 @@
     <DefineConstants>SUPPORT_STATE_CHANGE_EVENTS_NO</DefineConstants>
     <DefineConstants>SUPPORT_VALUE_CHANGE_THROTTLING_NO</DefineConstants>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <Configurations>Debug;Release</Configurations>
+    <Configurations>Debug;Release;EPAC_SIM</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CLF.DotNet.Common\Clf.Common\Clf.Common.csproj" />
+    <ProjectReference Include="..\..\DotNet.Common\Clf.Common\Clf.Common.csproj" />
     <ProjectReference Include="..\Clf.EpicsDlls\Clf.EpicsDlls.csproj" />
   </ItemGroup>
 

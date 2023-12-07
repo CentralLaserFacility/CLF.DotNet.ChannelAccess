@@ -86,7 +86,7 @@ namespace Clf.ChannelAccess
     {
       // Decrement the WrappedChannel reference count.
       // If it becomes zero, invoke Dispose() on the channel.
-      WrappedChannel.Dispose() ;
+      WrappedChannel?.Dispose() ;
       // ??? WrappedChannel = new InvalidChannel() ?????
       WrappedChannel = null! ; // USE THIS ONE !!!!
     }

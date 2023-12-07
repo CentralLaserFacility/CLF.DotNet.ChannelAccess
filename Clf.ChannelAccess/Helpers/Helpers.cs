@@ -243,6 +243,61 @@ namespace Clf.ChannelAccess
       } ;
     }
 
+    public static bool CanInferLogicNodeDbFieldDescriptorFromValueType(
+     System.Type valueType,
+     [NotNullWhen(true)] out ChannelAccess.DbFieldDescriptor? dbFieldDescriptor
+   )
+    {
+      ChannelAccess.DbFieldType? dbFieldType = null;
+      if (valueType.IsEnum)
+      {
+        dbFieldType = ChannelAccess.DbFieldType.DBF_ENUM_i16;
+      }
+      else
+      {
+        dbFieldType = valueType switch
+        {
+          System.Type when valueType == typeof(string) => ChannelAccess.DbFieldType.DBF_STRING_s39,
+          System.Type when valueType == typeof(short) => ChannelAccess.DbFieldType.DBF_SHORT_i16,
+          System.Type when valueType == typeof(float) => ChannelAccess.DbFieldType.DBF_FLOAT_f32,
+          System.Type when valueType == typeof(char) => ChannelAccess.DbFieldType.DBF_CHAR_byte,
+          System.Type when valueType == typeof(int) => ChannelAccess.DbFieldType.DBF_LONG_i32,
+          System.Type when valueType == typeof(double) => ChannelAccess.DbFieldType.DBF_DOUBLE_f64,
+          System.Type when valueType == typeof(bool) => ChannelAccess.DbFieldType.DBF_SHORT_i16,
+          _ => null
+        };
+      }
+      if (dbFieldType == null)
+      {
+        // A computed node's Value should never be of a type we can't handle.
+        // If ever that happens, should ...
+        // throw new System.Diagnostics.UnreachableException() ;
+        dbFieldDescriptor = null;
+      }
+      else
+      {
+        dbFieldDescriptor = new ChannelAccess.DbFieldDescriptor(
+          DbFieldType: dbFieldType.Value,
+          ElementsCountOnServer: 1,
+          IsWriteable: true
+        );
+        if (dbFieldType == ChannelAccess.DbFieldType.DBF_ENUM_i16)
+        {
+          dbFieldDescriptor = new ChannelAccess.DbFieldDescriptor(
+            DbFieldType: dbFieldType.Value,
+            ElementsCountOnServer: 1,
+            IsWriteable: true,
+            // C# enums always default to 0
+            InitialValueAsString: "0"
+          );
+          dbFieldDescriptor.SetEnumNames(
+            System.Enum.GetNames(valueType)
+          );
+        }
+      }
+      return dbFieldDescriptor != null;
+    }
+
   }
 
 }

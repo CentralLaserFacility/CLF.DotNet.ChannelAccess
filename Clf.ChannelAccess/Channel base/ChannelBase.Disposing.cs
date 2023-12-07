@@ -65,6 +65,7 @@ namespace Clf.ChannelAccess
     private bool m_cloneReferencesArePermitted = true ;
 
     internal bool CloneReferencesArePermitted => m_cloneReferencesArePermitted ;
+    internal bool InstanceHasActuallyBeenDisposed => m_instanceHasActuallyBeenDisposed;
 
     internal void DisableCloneReferences ( ) 
     {

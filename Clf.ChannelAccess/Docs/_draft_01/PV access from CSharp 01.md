@@ -90,7 +90,7 @@ The overall structure of a UI will look something like this :
         field(NELM,"1")     # Array length is ONE element
       }
 
-The 'record' statement declares a PV, of a particular type such as 'waveform', 'ao' ('analog output') and so on. There are a couple of dozen different standard options for the 'record type', and the one's we're most likely to encounter (for EPAC) are
+The 'record' statement declares a PV, of a particular type such as 'waveform', 'ao' ('analog output') and so on. There are a couple of dozen different standard options for the 'record type', and the one's we're most likely to encounter are
 
      aai        Analog Array Input    
      aao        Analog Array Output   

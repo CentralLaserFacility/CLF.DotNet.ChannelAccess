@@ -5,7 +5,8 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
-    <Configurations>Debug;Release;EPAC_SIM</Configurations>
+    <DefineConstants>OFFLINE_SIM</DefineConstants>
+    <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
